@@ -29,17 +29,9 @@ class Sensors {
       //  console.log("DB name is :", db_Name);
 
         const client = await mongo.connect(url, MONGO_OPTIONS);
-
-        //  let DB_ = client.db(db);
           let db = client.db(db_Name);
           //console.log("DB  : ",db);
 
-          //client.close();
-
-
-    //const url = 'mongodb://localhost:27017';
-  //  const client = await mongo.connect(MONGO_URL,{useUnifiedTopology: true, useNewUrlParser: true });
-    //const db = client.db(DB_NAME);
 
   /* ////////////////////  /  client.connect(function(err) {
       assert.equal(null, err);
@@ -92,6 +84,7 @@ class Sensors {
      let temp = await this.db.collection("sensorTypes").insertOne(sensorType);
     // let ans = await this.db.collection("sensorTypes").find().toArray();
      //console.log(ans);
+
   }
 
   /** Subject to field validation as per validate('addSensor', info)
@@ -105,14 +98,6 @@ class Sensors {
     const sensor = validate('addSensor', info);
     //@TODO
 
-    /*if(this.db.collection("sensors").model && this.db.collection("sensorTypes")[this.db.collection("sensors").model]){
-
-      }
-    else{
-      let temp = await this.db.collection("sensors").insertOne(sensor);
-      let ans = await this.db.collection("sensors").find().toArray();
-
-    } */
 
     let senType = await this.db.collection("sensorTypes").find().toArray();
 
@@ -514,8 +499,13 @@ class Sensors {
 
         else{
 
-            data = temp.filter((element,index) => index<5);
+            //data = temp.filter((element,index) => index<5);
                     //console.log("temp1",temp1);
+
+            let tri =[];
+            tri = temp.filter(element => element.status === 'ok');
+            data = tri.filter((element,index) => index<5);
+
         }
 
         temp3.forEach(function (v){
