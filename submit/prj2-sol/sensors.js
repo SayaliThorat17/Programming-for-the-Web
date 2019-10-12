@@ -84,7 +84,6 @@ class Sensors {
      let temp = await this.db.collection("sensorTypes").insertOne(sensorType);
     // let ans = await this.db.collection("sensorTypes").find().toArray();
      //console.log(ans);
-
   }
 
   /** Subject to field validation as per validate('addSensor', info)
