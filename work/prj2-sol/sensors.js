@@ -81,9 +81,40 @@ class Sensors {
     //@TODO
 
     //console.log("In Sensor_Types : ");
-     let temp = await this.db.collection("sensorTypes").insertOne(sensorType);
+
+     //let temp = await this.db.collection("sensorTypes").insertOne(sensorType);
     // let ans = await this.db.collection("sensorTypes").find().toArray();
      //console.log(ans);
+
+     /*let ab =
+     let a = this.db.collection("sensorTypes").getElementById(sensorType.id);
+     if(a){
+
+     }
+     else {
+       await this.db.collection("sensorTypes").insertOne(sensorType);
+     } */
+
+    /* Boolean status = this.db.collection("sensorTypes").find({id:sensorType.id}).toArray();
+     console.log(v);
+      if(v){
+        console.log("hi");
+      }
+      else{
+        await this.db.collection("sensorTypes").insertOne(sensorType);
+      }
+*/
+let temp = await this.db.collection("sensorTypes").find().toArray();
+      for(let i of temp){
+      //  let a = this.db.collection("sensorTypes").find({id:sensorType.id}).toArray();
+        if(i.id === sensorType.id){
+
+        }
+        else{
+          await this.db.collection("sensorTypes").insertOne(sensorType);
+        }
+      }
+
   }
 
   /** Subject to field validation as per validate('addSensor', info)
