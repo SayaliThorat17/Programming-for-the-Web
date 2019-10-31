@@ -3,6 +3,7 @@ const validate = require('./validate');
 
 const assert = require('assert');
 const mongo = require('mongodb').MongoClient;
+let u ;
 
 class Sensors {
 
@@ -19,6 +20,7 @@ class Sensors {
    *  be of the form mongodb://HOST:PORT/DB.
    */
   static async newSensors(mongoDbUrl) {
+  //  console.log("url",mongoDbUrl)
     const splits = mongoDbUrl.split('://');
     const dbIndex = mongoDbUrl.lastIndexOf('/');
     if (dbIndex < 0 || splits.length !== 2 || splits[0] !== 'mongodb') {
@@ -26,9 +28,10 @@ class Sensors {
       throw [ new AppError('BAD_MONGO_URL', msg) ];
     }
     const url = mongoDbUrl.slice(0, dbIndex);
+    u= mongoDbUrl;
     const db = mongoDbUrl.slice(dbIndex + 1);
     const client = await mongo.connect(url, MONGO_OPTIONS);
-    return new Sensors(client, db);    
+    return new Sensors(client, db);
   }
 
   /** Release all resources held by this Sensors instance.
@@ -55,7 +58,7 @@ class Sensors {
     const sensorType = validate('addSensorType', info);
     await this._add(this.sensorTypes, sensorType);
   }
-  
+
   /** Subject to field validation as per validate('addSensor', info)
    *  add sensor specified by info to this.  Note that info.model must
    *  specify the id of an existing sensor-type.  Replace any earlier
@@ -157,12 +160,23 @@ class Sensors {
       throw [ new AppError('NOT_FOUND',
 			   `no results for sensor-type id '${info.id}'`) ];
     }
-    return { data,
-	     nextIndex: nextIndex(searchSpecs, data),
-	     previousIndex: previousIndex(searchSpecs, data),
+console.log("info",info);
+console.log(searchSpecs);
+    //console.log("Data -" ,data);
+    /*let temp=[];
+    for(let i of temp){
+      for(let j of data){
+        i.
+      }
+    }
+    temp=data.slice(); */
+
+    return {previousIndex: previousIndex(searchSpecs, data),
+       nextIndex: nextIndex(searchSpecs, data),
+       data
 	   };
   }
-  
+
   /** Subject to validation of search-parameters in info as per
    *  validate('findSensors', info), return all sensors which satisfy
    *  search specifications in info.  Note that the search-specs can
@@ -214,7 +228,7 @@ class Sensors {
 	     previousIndex: previousIndex(searchSpecs, sensors),
 	   };
   }
-  
+
   /** Subject to validation of search-parameters in info as per
    *  validate('findSensorData', info), return all sensor readings
    *  which satisfy search specifications in info.  Note that info
@@ -227,7 +241,7 @@ class Sensors {
    *  property which is a list of objects giving readings for the
    *  sensor satisfying the search-specs.  Each object within data
    *  should contain the following properties:
-   * 
+   *
    *     timestamp: an integer giving the timestamp of the reading.
    *     value: a number giving the value of the reading.
    *     status: one of "ok", "error" or "outOfRange".
@@ -238,9 +252,9 @@ class Sensors {
    *  If the search-specs specify a timestamp property with value T,
    *  then the first returned reading should be the latest one having
    *  timestamp <= T.
-   * 
-   *  If info specifies a truthy value for a doDetail property, 
-   *  then the returned object will have additional 
+   *
+   *  If info specifies a truthy value for a doDetail property,
+   *  then the returned object will have additional
    *  an additional sensorType giving the sensor-type information
    *  for the sensor and a sensor property giving the sensor
    *  information for the sensor.
@@ -328,8 +342,8 @@ class Sensors {
     return mongoInfos.map(e => fromMongoInfo(e));
   }
 
-  
-  
+
+
 } //class Sensors
 
 module.exports = Sensors.newSensors;
@@ -344,10 +358,10 @@ function sensorDataId(sensorId, timestamp) {
 }
 
 function toMongoInfo(info) {
-  const isNoId = (info.id === undefined) || (info.id === null); 
+  const isNoId = (info.id === undefined) || (info.id === null);
   const mongoInfo = (isNoId) ? info : Object.assign({_id: info.id}, info);
   if (isNoId) delete mongoInfo.id;
-  return mongoInfo;  
+  return mongoInfo;
 }
 
 function fromMongoInfo(mongoInfo) {
@@ -371,7 +385,13 @@ function previousIndex(search, data) {
     ? search._index - search._count
     : 0;
 }
-
+function self(info,data){
+  let temp1 = u;
+  console.log(info);
+  console.log('data',data)
+  //let temp1 = u+'/'+data.id;
+  return(temp1);
+}
 const COLLECTIONS = [
   'sensorTypes',
   'sensors',
