@@ -3,7 +3,7 @@ const validate = require('./validate');
 
 const assert = require('assert');
 const mongo = require('mongodb').MongoClient;
-let u ;
+let u = 'http://localhost:2345/';
 
 class Sensors {
 
@@ -28,7 +28,6 @@ class Sensors {
       throw [ new AppError('BAD_MONGO_URL', msg) ];
     }
     const url = mongoDbUrl.slice(0, dbIndex);
-    u= mongoDbUrl;
     const db = mongoDbUrl.slice(dbIndex + 1);
     const client = await mongo.connect(url, MONGO_OPTIONS);
     return new Sensors(client, db);
@@ -160,17 +159,8 @@ class Sensors {
       throw [ new AppError('NOT_FOUND',
 			   `no results for sensor-type id '${info.id}'`) ];
     }
-console.log("info",info);
-console.log(searchSpecs);
-    //console.log("Data -" ,data);
-    /*let temp=[];
-    for(let i of temp){
-      for(let j of data){
-        i.
-      }
-    }
-    temp=data.slice(); */
 
+    self('sensor-types',data);
     return {previousIndex: previousIndex(searchSpecs, data),
        nextIndex: nextIndex(searchSpecs, data),
        data
@@ -215,6 +205,7 @@ console.log(searchSpecs);
       throw [ new AppError('NOT_FOUND',
 			   `no results for sensor id '${info.id}'`) ];
     }
+  //  self1('s',data);
     if (searchSpecs._doDetail) {
       for (const sensor of sensors) {
 	const sensorTypes =
@@ -223,6 +214,8 @@ console.log(searchSpecs);
 	sensor.sensorType = sensorTypes[0];
       }
     }
+
+    self('sensors',sensors);
     return { data: sensors,
 	     nextIndex: nextIndex(searchSpecs, sensors),
 	     previousIndex: previousIndex(searchSpecs, sensors),
@@ -299,13 +292,18 @@ console.log(searchSpecs);
 	  !inRange(v.value, sensorType.limits) ? 'error'
 	: !inRange(v.value, sensor.expected) ? 'outOfRange' : 'ok';
       if (statuses.has(status)) {
+
+        //self2('sensor-data',sensorId,data);
 	data.push({
 	  timestamp: t,
 	  value: v.value,
 	  status,
 	});
+    self2('sensor-data',sensorId,data);
       }
     }
+
+  //  self1('-data',data);
     const ret = { data };
     if (searchSpecs._doDetail) {
       ret.sensorType = sensorType; ret.sensor = sensor;
@@ -385,13 +383,27 @@ function previousIndex(search, data) {
     ? search._index - search._count
     : 0;
 }
-function self(info,data){
-  let temp1 = u;
-  console.log(info);
-  console.log('data',data)
-  //let temp1 = u+'/'+data.id;
-  return(temp1);
+
+function self(type,data){
+  for(let i of data){
+    i.self = u+type+'/'+i.id;
+  }
 }
+
+/*function self1(type,data){
+  for(let i of data){
+    i.self = u+type+'/'+i.id;
+  }
+}
+*/
+
+function self2(type,sensorId,data){
+  for(let i of data){
+    i.self = u+type+'/'+sensorId+'/'+i.timestamp;
+  }
+}
+
+
 const COLLECTIONS = [
   'sensorTypes',
   'sensors',

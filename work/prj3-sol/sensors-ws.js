@@ -16,7 +16,6 @@ function serve(port, sensors) {
 
   const app = express();
   app.locals.port = port;
-  //app.locals.base = base;
   app.locals.sensors = sensors;
   setupRoutes(app);
   app.listen(port, function() {
@@ -32,26 +31,21 @@ module.exports = {
 //@TODO routing function, handlers, utility functions
 
 function setupRoutes(app) {
-  const base = '/sensor-types';
-  const base1 = '/sensors';
-  const base2 = '/sensor-data';
+
   app.use(cors());
   app.use(bodyParser.json());
-  //app.get('/', sensor-types(app));
 
   app.get('/sensor-types', doList(app));
   app.get('/sensors',doList1(app));
   app.get('/sensor-data',doList2(app));
   app.post('/sensor-types', doCreate(app));
   app.post('/sensors',doCreate1(app));
-  app.post('/sensor-data',doCreate2(app));
+  app.post(`${'/sensor-data'}/:sensorId`, doReplace(app));
   app.get(`${'/sensor-types'}/:id`, doGet(app));
   app.get(`${'/sensors'}/:id`, doGet1(app));
   app.get(`${'/sensor-data'}/:id`, doGet2(app));
+  app.get(`${'/sensor-data'}/:id/:timestamp`, doGet3(app));
 
-/* app.delete(`${base}/:id`, doDelete(app));
- app.put(`${base}/:id`, doReplace(app));
-  app.patch(`${base}/:id`, doUpdate(app)); */
   app.use(doErrors()); //must be last
 }
 
@@ -61,7 +55,47 @@ function doList(app) {
     const q = req.query || {};
     try {
       const results = await app.locals.sensors.findSensorTypes(q);
-results.self = requestUrl(req);
+      results.self = requestUrl(req);
+
+    //  console.log(results.self)
+      let tempurl = results.self;
+      let splits = tempurl.split('?');
+      //console.log("0 ",splits[0]);
+      //console.log("1",splits[1]);
+
+      if(splits[1]=== undefined){
+      //  console.log("hi");
+        results.next = requestUrl(req)+'?_index=5';
+      }
+      else{
+      //  console.log("bye");
+
+        if(splits[1] === 'manufacturer=IBM'){
+
+        }
+        else {
+
+        let a = splits[1];
+        let tem = a.split('=');
+      //  console.log('1 :',tem[0]);
+        //console.log('2 :',tem[1]);
+        //console.log('3 :',tem[2]);
+
+        //tem[2] = 5&_count
+        let b = tem[1].split('&_');
+      //  console.log('1 :' ,b[0]);
+
+        let x = b[0];
+        let y = tem[2];
+
+        let i = parseFloat(x)+parseFloat(y);
+        let j = parseFloat(x)-parseFloat(y);
+        results.next ='http://localhost:2345/sensor-types?_index=' + i + '&_count=' + y;
+        results.prev = 'http://localhost:2345/sensor-types?_index=' + j + '&_count=' + y;
+      }
+
+      }
+
       res.json(results);
     }
     catch (err) {
@@ -76,7 +110,49 @@ function doList1(app) {
     const q = req.query || {};
     try {
       const results = await app.locals.sensors.findSensors(q);
-results.self = requestUrl(req);
+      results.self = requestUrl(req);
+
+      //  console.log(results.self)
+        let tempurl = results.self;
+        let splits = tempurl.split('?');
+        //console.log("0 ",splits[0]);
+        //console.log("1",splits[1]);
+
+        if(splits[1]=== undefined){
+        //  console.log("hi");
+          //results.next = requestUrl(req)+'?_index=5';
+        }
+        else{
+        //  console.log("bye");
+
+          if(splits[1] === 'model=ge-f26x&_count=2') {
+
+          let a = splits[1];
+          let tem = a.split('=');
+          let b = tem[1].split('&_');
+        //  console.log('1 :' ,b[0]);
+
+          let x = b[0];   //gef26x
+          let y = tem[2]; //2
+
+          results.next ='http://localhost:2345/sensors?model=' + x + '&_count=' + y +'&_index=' + y;
+         }
+         else if(splits[1] === '_count=2&_doDetail=true'){
+
+           let a = splits[1];
+           let tem = a.split('=');
+           let b = tem[1].split('&_');
+         //  console.log('1 :' ,b[0]);
+
+           let x = b[0];   //gef26x
+           let y = tem[2]; //2
+
+           results.next ='http://localhost:2345/sensors?_count=' + x + '&_doDetail=' + y +'&_index=' + x;
+
+          }
+
+
+        }
       res.json(results);
     }
     catch (err) {
@@ -90,8 +166,10 @@ function doList2(app) {
   return errorWrap(async function(req, res) {
     const q = req.query || {};
     try {
+      console.log('hehe');
       const results = await app.locals.sensors.findSensorData(q);
-results.self = requestUrl(req);
+      results.self = requestUrl(req);
+      console.log(results);
       res.json(results);
     }
     catch (err) {
@@ -100,6 +178,8 @@ results.self = requestUrl(req);
     }
   });
 }
+
+
 
 function doCreate(app) {
   return errorWrap(async function(req, res) {
@@ -136,30 +216,13 @@ function doCreate1(app) {
     }
   });
 }
-function doCreate2(app) {
-  return errorWrap(async function(req, res) {
-    try {
-      const obj = req.body;
-      //const results = await app.locals.sensors.addSensorType(obj);
-      const results1 = await app.locals.sensors.addSensorData(obj);
-      //results.self = requestUrl(req);
-    //  results1.append('Self', requestUrl(req) );
-      res.append('Location', requestUrl(req) + '/' + obj.id);
-      res.sendStatus(CREATED);
-    }
-    catch(err) {
-      const mapped = mapError(err);
-      res.status(mapped.status).json(mapped);
-    }
-  });
-}
-
 
 function doGet(app) {
   return errorWrap(async function(req, res) {
     try {
       const id = req.params.id;
       const results = await app.locals.sensors.findSensorTypes({ id: id });
+      results.self = requestUrl(req);
       if (results.length === 0) {
 	throw {
 	  isDomain: true,
@@ -183,6 +246,7 @@ function doGet1(app) {
     try {
       const id = req.params.id;
       const results = await app.locals.sensors.findSensors({ id: id });
+      results.self = requestUrl(req);
       if (results.length === 0) {
 	throw {
 	  isDomain: true,
@@ -205,7 +269,17 @@ function doGet2(app) {
   return errorWrap(async function(req, res) {
     try {
       const id = req.params.id;
-      const results = await app.locals.sensors.findSensorData({ sensorId: id });
+      const timestamp = req.query.timestamp;
+      const statuses = req.query.statuses;
+      //  console.log('hoho');
+        //console.log('req',req);
+      const results = await app.locals.sensors.findSensorData({ sensorId: id ,timestamp : timestamp, statuses : statuses});
+      //console.log(results);
+      results.self = requestUrl(req);
+      /*for(var i of results.data){
+
+        i.self = requestUrl(req);
+      } */
       if (results.length === 0) {
 	throw {
 	  isDomain: true,
@@ -224,13 +298,32 @@ function doGet2(app) {
   });
 }
 
-
-/*function doDelete(app) {
+function doGet3(app) {
   return errorWrap(async function(req, res) {
     try {
       const id = req.params.id;
-      const results = await app.locals.sensors.delete({ id: id });
-      res.sendStatus(OK);
+      const timestamp = req.params.timestamp;
+      //  console.log('hoho');
+        //console.log('req',req);
+      const results = await app.locals.sensors.findSensorData({ sensorId: id , timestamp : timestamp});
+      //console.log(results);
+
+      //console.log('0',results);
+      //console.log('1',results.data[0]);
+
+
+      results.self = requestUrl(req);
+
+      if (results.length === 0) {
+	throw {
+	  isDomain: true,
+	  errorCode: 'NOT_FOUND',
+	  message: `user ${id} not found`,
+	};
+      }
+      else {
+	res.json(results.data[0]);
+      }
     }
     catch(err) {
       const mapped = mapError(err);
@@ -238,14 +331,18 @@ function doGet2(app) {
     }
   });
 }
+
 
 function doReplace(app) {
   return errorWrap(async function(req, res) {
     try {
       const replacement = Object.assign({}, req.body);
-      replacement.id = req.params.id;
-      const results = await app.locals.sensors.replace(replacement);
-      res.sendStatus(OK);
+      replacement.sensorId = req.params.sensorId;
+      //console.log('1',replacement);
+      //console.log('2',replacement.sensorId);
+      const results = await app.locals.sensors.addSensorData(replacement);
+    //  console.log(results);
+      res.sendStatus(CREATED);
     }
     catch(err) {
       const mapped = mapError(err);
@@ -255,20 +352,6 @@ function doReplace(app) {
 }
 
 
-function doUpdate(app) {
-  return errorWrap(async function(req, res) {
-    try {
-      const patch = Object.assign({}, req.body);
-      patch.id = req.params.id;
-      const results = app.locals.sensors.update(patch);
-      res.sendStatus(OK);
-    }
-    catch(err) {
-      const mapped = mapError(err);
-      res.status(mapped.status).json(mapped);
-    }
-  });
-} */
 
 
 /** Ensures a server error results in nice JSON sent back to client
@@ -306,18 +389,18 @@ const ERROR_MAP = {
  *  object will have a "status" property corresponding to HTTP status
  *  code.
  */
-function mapError(err) {
-  console.error(err);
-  return err.isDomain
-    ? { status: (ERROR_MAP[err.errorCode] || BAD_REQUEST),
-	code: err.errorCode,
-	message: err.message
-      }
-    : { status: SERVER_ERROR,
-	code: 'NOT_FOUND',
-	message: err.toString()
-      };
-}
+ function mapError(err) {
+   console.error(err);
+   return err.isDomain
+     ? { status: (ERROR_MAP[err.errorCode] || BAD_REQUEST),
+ 	code: err.errorCode,
+ 	message: err.message
+       }
+     : { status: SERVER_ERROR,
+ 	code: 'INTERNAL',
+ 	message: err.toString()
+       };
+ }
 
 /****************************** Utilities ******************************/
 
