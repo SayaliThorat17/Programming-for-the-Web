@@ -280,11 +280,12 @@ function doGet2(app) {
 
         i.self = requestUrl(req);
       } */
+
       if (results.length === 0) {
 	throw {
 	  isDomain: true,
 	  errorCode: 'NOT_FOUND',
-	  message: `user ${id} not found`,
+	  message: `no data for timestamp ${timestamp}`,
 	};
       }
       else {
@@ -311,19 +312,34 @@ function doGet3(app) {
       //console.log('0',results);
       //console.log('1',results.data[0]);
 
+      //data.self = requestUrl(req);
+      var data=[];
+      var flag=0;
+      for(let i of results.data){
+        if(i.timestamp == timestamp){
+        data.push(i);
+        }
+        else{
+          flag =1;
+        }
 
-      results.self = requestUrl(req);
+      }
+//res.json({data:data,self:requestUrl(req),nextIndex:-1});
 
-      if (results.length === 0) {
+      /*const temp = [];
+      temp.push(results.data[0]);
+      temp.self = requestUrl(req);
+      console.log('temp-self :',temp.self); */
+      if ((results.length === 0) || (flag===1)){
 	throw {
 	  isDomain: true,
 	  errorCode: 'NOT_FOUND',
-	  message: `user ${id} not found`,
+	  message: `no data for timestamp ${timestamp}`,
 	};
       }
       else {
-	res.json(results.data[0]);
-      }
+	res.json({data:data,self:requestUrl(req),nextIndex:-1});
+}
     }
     catch(err) {
       const mapped = mapError(err);
@@ -359,8 +375,8 @@ function doReplace(app) {
  */
 function doErrors(app) {
   return async function(err, req, res, next) {
-    res.status(SERVER_ERROR);
-    res.json({ code: 'SERVER_ERROR', message: err.message });
+    //res.status(SERVER_ERROR);
+    res.json({ code: '', message: err.message });
     console.error(err);
   };
 }
@@ -396,8 +412,8 @@ const ERROR_MAP = {
  	code: err.errorCode,
  	message: err.message
        }
-     : { status: SERVER_ERROR,
- 	code: 'INTERNAL',
+     : { status: NOT_FOUND,
+ 	code: 'NOT_FOUND',
  	message: err.toString()
        };
  }
