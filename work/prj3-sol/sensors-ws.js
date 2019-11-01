@@ -317,20 +317,20 @@ function doGet3(app) {
       var flag=0;
       for(let i of results.data){
         if(i.timestamp == timestamp){
-        data.push(i);
-        }
-        else{
           flag =1;
+          data.push(i);
         }
 
       }
+      //console.log("flag",flag);
+
 //res.json({data:data,self:requestUrl(req),nextIndex:-1});
 
       /*const temp = [];
       temp.push(results.data[0]);
       temp.self = requestUrl(req);
       console.log('temp-self :',temp.self); */
-      if ((results.length === 0) || (flag===1)){
+    if ((flag===0)){
 	throw {
 	  isDomain: true,
 	  errorCode: 'NOT_FOUND',
@@ -339,7 +339,9 @@ function doGet3(app) {
       }
       else {
 	res.json({data:data,self:requestUrl(req),nextIndex:-1});
-}
+
+  }
+
     }
     catch(err) {
       const mapped = mapError(err);
@@ -375,8 +377,8 @@ function doReplace(app) {
  */
 function doErrors(app) {
   return async function(err, req, res, next) {
-    //res.status(SERVER_ERROR);
-    res.json({ code: '', message: err.message });
+    res.status(SERVER_ERROR);
+    res.json({ code: 'SERVER_ERROR', message: err.message });
     console.error(err);
   };
 }
