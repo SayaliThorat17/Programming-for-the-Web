@@ -100,7 +100,11 @@ function doList(app) {
     }
     catch (err) {
       const mapped = mapError(err);
-      res.status(mapped.status).json(mapped);
+      const obj =Object.assign({}, mapped);
+      //obj = mapped;
+      delete obj.status;
+      const result1 = {errors : [obj]};
+      res.status(mapped.status).json(result1);
     }
   });
 }
@@ -157,7 +161,11 @@ function doList1(app) {
     }
     catch (err) {
       const mapped = mapError(err);
-      res.status(mapped.status).json(mapped);
+      const obj =Object.assign({}, mapped);
+      //obj = mapped;
+      delete obj.status;
+      const result1 = {errors : [obj]};
+      res.status(mapped.status).json(result1);
     }
   });
 }
@@ -174,7 +182,11 @@ function doList2(app) {
     }
     catch (err) {
       const mapped = mapError(err);
-      res.status(mapped.status).json(mapped);
+      const obj =Object.assign({}, mapped);
+      //obj = mapped;
+      delete obj.status;
+      const result1 = {errors : [obj]};
+      res.status(mapped.status).json(result1);
     }
   });
 }
@@ -237,7 +249,11 @@ function doGet(app) {
     }
     catch(err) {
       const mapped = mapError(err);
-      res.status(mapped.status).json(mapped);
+      const obj =Object.assign({}, mapped);
+      //obj = mapped;
+      delete obj.status;
+      const result1 = {errors : [obj]};
+      res.status(mapped.status).json(result1);
     }
   });
 }
@@ -295,7 +311,11 @@ function doGet2(app) {
     }
     catch(err) {
       const mapped = mapError(err);
-      res.status(mapped.status).json(mapped);
+      const obj =Object.assign({}, mapped);
+      //obj = mapped;
+      delete obj.status;
+      const result1 = {errors : [obj]};
+      res.status(mapped.status).json(result1);
     }
   });
 }
@@ -346,7 +366,11 @@ function doGet3(app) {
     }
     catch(err) {
       const mapped = mapError(err);
-      res.status(mapped.status).json(mapped);
+      const obj =Object.assign({}, mapped);
+      //obj = mapped;
+      delete obj.status;
+      const result1 = {errors : [obj]};
+      res.status(mapped.status).json(result1);
     }
   });
 }
