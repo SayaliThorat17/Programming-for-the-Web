@@ -87,7 +87,7 @@ const FIELDS_INFO = {
 
   min: {
     friendlyName: 'Min',
-    isSearch: true,
+    isSearch: false,
     isId: true,
     isRequired: true,
     isSelectBox: false,
@@ -98,7 +98,7 @@ const FIELDS_INFO = {
 
   max: {
     friendlyName: 'Max',
-    isSearch: true,
+    isSearch: false,
     isId: true,
     isRequired: true,
     isSelectBox: false,
@@ -198,16 +198,25 @@ const FIELDS =
       let users = [];
       let errors = undefined;
       const search = getNonEmptyValues(req.query);
+      console.log("search",search);
+
       if (isSubmit) {
         errors = validate(search);
         if (Object.keys(search).length == 0) {
   	const msg = 'at least one search parameter must be specified';
   	errors = Object.assign(errors || {}, { _: msg });
         }
-        if (!errors) {
+      //  if (!errors) {
   	const q = querystring.stringify(search);
+
+    let str = q;
+    let temp = str.split(':');
+    let temp1 = temp1[1];
+    //console.log("temp",temp1[1]);
+
   	try {
-  	  users = await app.locals.model.list(q);
+      console.log("temp",temp1[1]);
+  	  users = await app.locals.model.list('sensor-types',{});
   	}
   	catch (err) {
             console.error(err);
@@ -216,19 +225,19 @@ const FIELDS =
   	if (users.length === 0) {
   	  errors = {_: 'no users found for specified criteria; please retry'};
   	}
-        }
+        //}
       }
       let model, template;
-      if (users.length > 0) {
-        template = 'details';
+  //    if (users.length > 0) {
+    //    template = 'details';
         const fields =
-  	users.map((u) => ({id: u.id, fields: fieldsWithValues(u)}));
+  	users.data.map((u) => ({id: u.id, fields: fieldsWithValues(u)}));
         model = { base: app.locals.base, users: fields };
-      }
-      else {
-        template =  'search';
+      //}
+      //else {
+        template =  'tst-sensor-types-search';
         model = errorModel(app, search, errors);
-      }
+      //}
       const html = doMustache(app, 'tst-sensor-types-search', model);
       res.send(html);
     };
