@@ -201,17 +201,17 @@ const FIELDS =
 
       let errors = validate(user, ['id']);
 
-      console.log("Users :",user);
+      //console.log("Users :",user);
       user.unit = 'PSI';
-      console.log("User min",user.min);
-      console.log("User max",user.max);
-      console.log("unit :",user.unit);
+    //  console.log("User min",user.min);
+    //  console.log("User max",user.max);
+    //  console.log("unit :",user.unit);
       let min = user.min;
       let max = user.max;
       user.limits={min,max};
       //let min,max;
       //user.limits={min:user.min,max=user.max};
-      console.log("Limits",user.limits);
+      //console.log("Limits",user.limits);
       //const isUpdate = req.body.submit === 'update';
       if (!errors) {
         try {
@@ -296,7 +296,7 @@ const FIELDS =
         //template = 'details';
         const fields =
   	users.data.map((u) => ({id: u.id, fields: fieldsWithValues(u)}));
-        model = { base: app.locals.base, users: fields };
+        model = { base: app.locals.base, users: fields, fields:FIELDS };
       //}
       //else {
       //  template =  'search';
@@ -324,8 +324,8 @@ function createUpdateUserSensors(app) {
 
     let errors = validate1(user, ['id']);
 
-    console.log("Users :",user);
-    console.log("period:",user.period);
+    //console.log("Users :",user);
+    //console.log("period:",user.period);
   /*  user.unit = 'PSI';
     console.log("User min",user.min);
     console.log("User max",user.max);
@@ -358,7 +358,7 @@ function createUpdateUserSensors(app) {
       }
     //}
     if (errors) {
-      const model = errorModel(app, user, errors);
+      const model = errorModel1(app, user, errors);
     //  const html = doMustache(app, (isUpdate) ? 'update' : 'create', model);
     const html = doMustache(app,'tst-sensors-add',model);
       res.send(html);
@@ -374,16 +374,16 @@ function SearchSensors(app) {
     let users = [];
     let errors = undefined;
     const search = getNonEmptyValues1(req.query);
-    if (isSubmit) {
+    //if (isSubmit) {
       errors = validate1(search);
       if (Object.keys(search).length == 0) {
 	const msg = 'at least one search parameter must be specified';
 	errors = Object.assign(errors || {}, { _: msg });
       }
-      if (!errors) {
+      //if (!errors) {
 	const q = querystring.stringify(search);
 	try {
-	  users = await app.locals.model.list(q);
+	  users = await app.locals.model.list('sensors',search);
 	}
 	catch (err) {
           console.error(err);
@@ -392,19 +392,19 @@ function SearchSensors(app) {
 	if (users.length === 0) {
 	  errors = {_: 'no users found for specified criteria; please retry'};
 	}
-      }
-    }
+    //  }
+    //}
     let model, template;
-    if (users.length > 0) {
-      template = 'details';
+  //  if (users.length > 0) {
+    //  template = 'details';
       const fields =
-	users.map((u) => ({id: u.id, fields: fieldsWithValues1(u)}));
-      model = { base: app.locals.base, users: fields };
-    }
-    else {
-      template =  'search';
-      model = errorModel1(app, search, errors);
-    }
+	users.data.map((u) => ({id: u.id, fields: fieldsWithValues1(u)}));
+      model = { base: app.locals.base, users: fields ,fields:FIELDS1};
+  //  }
+  //  else {
+    //  template =  'search';
+    //  model = errorModel1(app, search, errors);
+    //}
     const html = doMustache(app, 'tst-sensors-search', model);
     res.send(html);
   };

@@ -43,8 +43,6 @@
            value="{{value}}">
    {{/isSelectBox}}
 
-
-
       </label>
 	    <br/>
 	    {{#errorMessage}}
@@ -55,9 +53,14 @@
       <input name="search" type="submit" value="search" class="control">
 
 
+
     </form>
 
-  <!--  {{#users}}
+
+
+
+
+   {{#users}}
          <dl>
            {{#fields}}
    	  {{#value}}
@@ -67,7 +70,7 @@
    	{{/fields}}
 
          </dl>
-       {{/users}} -->
+       {{/users}}
 
     {{>footer}}
   </body>
