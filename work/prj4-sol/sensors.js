@@ -36,7 +36,10 @@ function setupRoutes(app) {
   app.post(`${base}/tst-sensor-types-add.html`, bodyParser.urlencoded({extended: false}),
 	   createUpdateUser(app));
   app.get(`${base}/tst-sensor-types-search.html`, doSearch(app));
-
+  app.get(`${base}/tst-sensors-add.html`, addSensors(app));
+  app.post(`${base}/tst-sensors-add.html`, bodyParser.urlencoded({extended: false}),
+	   createUpdateUserSensors(app));
+  app.get(`${base}/tst-sensors-search.html`, SensorsSearch(app));
 }
 
 const FIELDS_INFO = {
@@ -87,7 +90,7 @@ const FIELDS_INFO = {
 
   min: {
     friendlyName: 'Min',
-    isSearch: false,
+    isSearch: true,
     isId: true,
     isRequired: true,
     isSelectBox: false,
@@ -98,7 +101,7 @@ const FIELDS_INFO = {
 
   max: {
     friendlyName: 'Max',
-    isSearch: false,
+    isSearch: true,
     isId: true,
     isRequired: true,
     isSelectBox: false,
@@ -112,7 +115,73 @@ const FIELDS_INFO = {
 const FIELDS =
   Object.keys(FIELDS_INFO).map((n) => Object.assign({name: n}, FIELDS_INFO[n]));
 
+
+///////Sensors
+  const FIELDS_INFO1 = {
+    id: {
+      friendlyName: 'Sensor ID',
+      isSearch: true,
+      isId: true,
+      isRequired: true,
+      //isSelectBox: false,
+      //isLimits: false,
+      regex: /^\w+$/,
+      error: 'User Id field can only contain alphanumerics or _',
+    },
+
+    model: {
+      friendlyName: 'Model',
+      isSearch: true,
+      isId: true,
+      isRequired: true,
+    //  isSelectBox: false,
+      //isLimits: false,
+      regex: /^\w+$/,
+      error: 'Model field can only contain alphanumerics or _',
+    },
+
+
+    period: {
+      friendlyName: 'Period',
+      isSearch: true,
+      isId: true,
+      isRequired: true,
+      //isSelectBox: true,
+      //isLimits: false,
+      regex: /^\w+$/,
+      error: 'Period field can only contain alphanumerics or _',
+    },
+
+
+    min: {
+      friendlyName: 'Min',
+      isSearch: true,
+      isId: true,
+      isRequired: true,
+      //isSelectBox: false,
+      //isLimits: true,
+      regex: /^\w+$/,
+      error: 'Min field can only contain alphanumerics or _',
+    },
+
+    max: {
+      friendlyName: 'Max',
+      isSearch: true,
+      isId: true,
+      isRequired: true,
+    //isSelectBox: false,
+    // isLimits: true,
+      regex: /^\w+$/,
+      error: 'Max field can only contain alphanumerics or _',
+    },
+
+  };
+
+  const FIELDS1 =
+    Object.keys(FIELDS_INFO1).map((n) => Object.assign({name: n}, FIELDS_INFO1[n]));
+
 //////Functions
+///SensorTypes
   function createUserForm(app) {
     return async function(req, res) {
       const model = { base: app.locals.base, fields: FIELDS };
@@ -198,25 +267,16 @@ const FIELDS =
       let users = [];
       let errors = undefined;
       const search = getNonEmptyValues(req.query);
-      console.log("search",search);
-
       if (isSubmit) {
         errors = validate(search);
         if (Object.keys(search).length == 0) {
   	const msg = 'at least one search parameter must be specified';
   	errors = Object.assign(errors || {}, { _: msg });
         }
-      //  if (!errors) {
+        if (!errors) {
   	const q = querystring.stringify(search);
-
-    let str = q;
-    let temp = str.split(':');
-    let temp1 = temp1[1];
-    //console.log("temp",temp1[1]);
-
   	try {
-      console.log("temp",temp1[1]);
-  	  users = await app.locals.model.list('sensor-types',{});
+  	  users = await app.locals.model.list(q);
   	}
   	catch (err) {
             console.error(err);
@@ -225,23 +285,124 @@ const FIELDS =
   	if (users.length === 0) {
   	  errors = {_: 'no users found for specified criteria; please retry'};
   	}
-        //}
+        }
       }
       let model, template;
-  //    if (users.length > 0) {
-    //    template = 'details';
+      if (users.length > 0) {
+        template = 'details';
         const fields =
-  	users.data.map((u) => ({id: u.id, fields: fieldsWithValues(u)}));
+  	users.map((u) => ({id: u.id, fields: fieldsWithValues(u)}));
         model = { base: app.locals.base, users: fields };
-      //}
-      //else {
-        template =  'tst-sensor-types-search';
+      }
+      else {
+        template =  'search';
         model = errorModel(app, search, errors);
-      //}
+      }
       const html = doMustache(app, 'tst-sensor-types-search', model);
       res.send(html);
     };
   };
+
+
+///////sensors
+function addSensors(app) {
+  return async function(req, res) {
+    const model = { base: app.locals.base, fields: FIELDS1 };
+    const html = doMustache(app, 'tst-sensors-add', model);
+    res.send(html);
+  };
+};
+
+
+function createUpdateUserSensors(app) {
+  return async function(req, res) {
+    const user = getNonEmptyValues1(req.body);
+
+    let errors = validate1(user, ['id']);
+
+    console.log("Users :",user);
+    console.log("period:",user.period);
+  /*  user.unit = 'PSI';
+    console.log("User min",user.min);
+    console.log("User max",user.max);
+    console.log("unit :",user.unit);
+    let min = user.min;
+    let max = user.max;
+    user.limits={min,max};
+    //let min,max;
+    //user.limits={min:user.min,max=user.max};
+    console.log("Limits",user.limits); */
+    //const isUpdate = req.body.submit === 'update';
+
+    let min = user.min;
+    let max = user.max;
+    user.expected={min,max};
+
+    //if (!errors) {
+      try {
+//	if (isUpdate) {
+    await app.locals.model.update('sensors',user);
+  //}
+//	else {
+  //  await app.locals.model.create(user);
+  //}
+  res.redirect(`${app.locals.base}/tst-sensors-search.html`);
+      }
+      catch (err) {
+  console.error(err);
+  errors = wsErrors(err);
+      }
+    //}
+    if (errors) {
+      const model = errorModel(app, user, errors);
+    //  const html = doMustache(app, (isUpdate) ? 'update' : 'create', model);
+    const html = doMustache(app,'tst-sensors-add',model);
+      res.send(html);
+    }
+  };
+};
+
+function SensorsSearch(app) {
+  return async function(req, res) {
+    const isSubmit = req.query.submit !== undefined;
+    let users = [];
+    let errors = undefined;
+    const search = getNonEmptyValues(req.query);
+    if (isSubmit) {
+      errors = validate(search);
+      if (Object.keys(search).length == 0) {
+  const msg = 'at least one search parameter must be specified';
+  errors = Object.assign(errors || {}, { _: msg });
+      }
+      if (!errors) {
+  const q = querystring.stringify(search);
+  try {
+    users = await app.locals.model.list(q);
+  }
+  catch (err) {
+          console.error(err);
+    errors = wsErrors(err);
+  }
+  if (users.length === 0) {
+    errors = {_: 'no users found for specified criteria; please retry'};
+  }
+      }
+    }
+    let model, template;
+    if (users.length > 0) {
+      template = 'details';
+      const fields =
+  users.map((u) => ({id: u.id, fields: fieldsWithValues(u)}));
+      model = { base: app.locals.base, users: fields };
+    }
+    else {
+      template =  'search';
+      model = errorModel(app, search, errors);
+    }
+    const html = doMustache(app, 'tst-sensors-search', model);
+    res.send(html);
+  };
+};
 
 
   /** Return copy of FIELDS with values and errors injected into it. */
@@ -275,10 +436,42 @@ function validate(values, requires=[]) {
   return Object.keys(errors).length > 0 && errors;
 }
 
+//Sensors
+function validate1(values, requires=[]) {
+  const errors = {};
+  requires.forEach(function (name) {
+    if (values[name] === undefined) {
+      errors[name] =
+	`A value for '${FIELDS_INFO1[name].friendlyName}' must be provided`;
+    }
+  });
+  for (const name of Object.keys(values)) {
+    const fieldInfo = FIELDS_INFO1[name];
+    const value = values[name];
+    if (fieldInfo.regex && !value.match(fieldInfo.regex)) {
+      errors[name] = fieldInfo.error;
+    }
+  }
+  return Object.keys(errors).length > 0 && errors;
+}
+
+
 function getNonEmptyValues(values) {
   const out = {};
   Object.keys(values).forEach(function(k) {
     if (FIELDS_INFO[k] !== undefined) {
+      const v = values[k];
+      if (v && v.trim().length > 0) out[k] = v.trim();
+    }
+  });
+  return out;
+}
+
+//Sensors
+function getNonEmptyValues1(values) {
+  const out = {};
+  Object.keys(values).forEach(function(k) {
+    if (FIELDS_INFO1[k] !== undefined) {
       const v = values[k];
       if (v && v.trim().length > 0) out[k] = v.trim();
     }

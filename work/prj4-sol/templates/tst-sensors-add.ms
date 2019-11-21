@@ -11,7 +11,7 @@
         <li class="error">{{.}}</li>
       {{/errors}}
     </ul>
-    <form method="POST" action="{{{base}}}/tst-sensor-types-add.html">
+    <form method="POST" action="{{{base}}}/tst-sensors-add.html">
 
     {{#fields}}
   	    <label>
@@ -20,9 +20,11 @@
   	      {{friendlyName}}{{#isRequired}}* {{/isRequired}}
   	    </span>
 
+
             <input name="{{name}}" {{#type}}type="{{type}}"{{/type}}
               value="{{value}}">
-              
+
+
   	    </label>
   	    <br/>
 	    {{#errorMessage}}
