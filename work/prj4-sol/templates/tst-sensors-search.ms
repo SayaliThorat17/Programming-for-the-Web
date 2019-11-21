@@ -16,13 +16,13 @@
 	{{#fields}}
 	  {{#isSearch}}
 	    <label>
+        {{#isSensorsSearch}}
+	         <span class="label">{{friendlyName}}</span>
 
-	    <span class="label">{{friendlyName}}</span>
 
-
-         <input name="{{name}}" {{#type}}type="{{type}}"{{/type}}
-           value="{{value}}">
-
+           <input name="{{name}}" {{#type}}type="{{type}}"{{/type}}
+            value="{{value}}">
+        {{/isSensorsSearch}}
 
       </label>
 	    <br/>
