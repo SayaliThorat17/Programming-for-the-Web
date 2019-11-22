@@ -51,6 +51,7 @@ const FIELDS_INFO = {
     isRequired: true,
     isSelectBox: false,
     isLimits: false,
+    isDisplay: true,
     regex: /^\w+$/,
     error: 'User Id field can only contain alphanumerics or _',
   },
@@ -62,6 +63,7 @@ const FIELDS_INFO = {
     isRequired: true,
     isSelectBox: false,
     isLimits: false,
+    isDisplay: true,
     regex: /^\w+$/,
     error: 'User Id field can only contain alphanumerics or _',
   },
@@ -73,6 +75,7 @@ const FIELDS_INFO = {
     isRequired: true,
     isSelectBox: false,
     isLimits: false,
+    isDisplay: true,
     regex: /^\w+$/,
     error: 'User Id field can only contain alphanumerics or _',
   },
@@ -84,6 +87,7 @@ const FIELDS_INFO = {
     isRequired: true,
     isSelectBox: true,
     isLimits: false,
+    isDisplay: true,
     regex: /^\w+$/,
     error: 'User Id field can only contain alphanumerics or _',
   },
@@ -95,6 +99,7 @@ const FIELDS_INFO = {
     //isId: true,
     isRequired: true,
     isSelectBox: false,
+    isDisplay: false,
     //isLimits: true,
     regex: /^\w+$/,
     error: 'User Id field can only contain alphanumerics or _',
@@ -106,6 +111,7 @@ const FIELDS_INFO = {
   //  isId: true,
     isRequired: true,
     isSelectBox: false,
+    isDisplay: false,
   //  isLimits: true,
     regex: /^\w+$/,
     error: 'User Id field can only contain alphanumerics or _',
@@ -231,7 +237,7 @@ const FIELDS =
       if (errors) {
         const model = errorModel(app, user, errors);
       //  const html = doMustache(app, (isUpdate) ? 'update' : 'create', model);
-      const html = doMustache(app,'tst-sensor-types-search',model);
+      const html = doMustache(app,'tst-sensor-types-add',model);
         res.send(html);
       }
     };
@@ -281,6 +287,11 @@ const FIELDS =
   	const q = querystring.stringify(search);
   	try {
   	  users = await app.locals.model.list('sensor-types',search);
+
+      for(let i=0;i<users.data.length;i++){
+        users.data[i].min = users.data[i].limits.min;
+        users.data[i].max =users.data[i].limits.max;
+      }
   	}
   	catch (err) {
             console.error(err);
@@ -384,6 +395,10 @@ function SearchSensors(app) {
 	const q = querystring.stringify(search);
 	try {
 	  users = await app.locals.model.list('sensors',search);
+    for(let i=0;i<users.data.length;i++){
+      users.data[i].min = users.data[i].expected.min;
+      users.data[i].max =users.data[i].expected.max;
+    }
 	}
 	catch (err) {
           console.error(err);

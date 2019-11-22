@@ -38,18 +38,56 @@
 
     </form>
 
-    {{#users}}
-          <dl>
+    <h2>Results Summary</h2>
+
+
+   <!--{{#users}}
+         <dl>
+           {{#fields}}
+
+             <dt>{{friendlyName}}</dt>
+             <dd>{{value}}</dd>
+
+   	{{/fields}}
+
+         </dl>
+       {{/users}} -->
+
+
+
+
+
+
+<table border="5" width="50%" cellpadding="4" cellspacing="3" >
+
+  <tr>
+           <th>Sensor ID</th>
+           <th>Model</th>
+           <th>Period	</th>
+           <th colspan="2">Expected Range</th>
+  </tr>
+  <tr>
+           <th></th>
+           <th></th>
+           <th></th>
+           <th>Min</th>
+           <th>Max</th>
+  </tr>
+
+           {{#users}}
+           <tr>
             {{#fields}}
-       {{#value}}
-              <dt>{{friendlyName}}</dt>
-              <dd>{{value}}</dd>
-       {{/value}}
-     {{/fields}}
 
-          </dl>
-        {{/users}}
 
+
+                      <td>{{value}}</td>
+
+
+             {{/fields}}
+           </tr>
+             {{/users}}
+
+</table>
     {{>footer}}
   </body>
 </html>

@@ -14,6 +14,7 @@
     <form method="GET" action="{{{base}}}/tst-sensor-types-search.html">
 
 	{{#fields}}
+  {{#isDisplay}}
 	  {{#isSearch}}
 	    <label>
 	    <span class="label">{{friendlyName}}</span>
@@ -49,6 +50,7 @@
 	      <span class="error">{{errorMessage}}</span><br/>
 	    {{/errorMessage}}
 	  {{/isSearch}}
+    {{/isDisplay}}
 	 {{/fields}}
       <input name="search" type="submit" value="search" class="control">
 
@@ -57,21 +59,58 @@
     </form>
 
 
+    <h2>Results Summary</h2>
 
 
-
-   {{#users}}
+   <!--{{#users}}
          <dl>
            {{#fields}}
-   	  {{#value}}
+
              <dt>{{friendlyName}}</dt>
              <dd>{{value}}</dd>
-   	  {{/value}}
+
    	{{/fields}}
 
          </dl>
-       {{/users}}
+       {{/users}} -->
 
+
+
+
+
+
+<table border="5" cellspacing="3"  >
+
+  <tr>
+           <th>Sensor Type ID</th>
+           <th>Model Number</th>
+           <th>Manufacturer</th>
+           <th>Measure</th>
+           <th colspan="2">Limits</th>
+  </tr>
+  <tr>
+           <th></th>
+           <th></th>
+           <th></th>
+           <th></th>
+           <th>Min</th>
+           <th>Max</th>
+  </tr>
+
+           {{#users}}
+           <tr>
+            {{#fields}}
+
+
+
+                      <td>{{value}}</td>
+
+
+             {{/fields}}
+           </tr>
+             {{/users}}
+
+</table>
     {{>footer}}
   </body>
 </html>
