@@ -5,26 +5,29 @@
     <link rel="stylesheet" href="{{{base}}}/css/style.css">
   </head>
   <body>
+    <div class="page">
     <h1>Search Sensors</h1>
     <ul>
       {{#errors}}
-        <li class="error">{{.}}</li>
+        <li class="error">{{errors}}</li>
       {{/errors}}
     </ul>
-    <form method="GET" action="{{{base}}}/tst-sensors-search.html">
+ <form method="GET" action="{{{base}}}/tst-sensors-search.html">
 
 	{{#fields}}
 	  {{#isSearch}}
-	    <label>
-        {{#isSensorsSearch}}
-	         <span class="label">{{friendlyName}}</span>
+    {{#isSensorsSearch}}
 
+	    <label>
+        <div>
+
+	         <span class="label">{{friendlyName}}</span>
+      </label>
 
            <input name="{{name}}" {{#type}}type="{{type}}"{{/type}}
             value="{{value}}">
+            </div>
         {{/isSensorsSearch}}
-
-      </label>
 	    <br/>
 	    {{#errorMessage}}
 	      <span class="error">{{errorMessage}}</span><br/>
@@ -37,7 +40,7 @@
 
 
     </form>
-
+  </div>
     <h2>Results Summary</h2>
 
 
@@ -58,7 +61,7 @@
 
 
 
-<table border="5" width="50%" cellpadding="4" cellspacing="3" >
+<table border="1" width="100%" >
 
   <tr>
            <th>Sensor ID</th>
@@ -80,7 +83,7 @@
 
 
 
-                      <td>{{value}}</td>
+                      <td style="text-align:center">{{value}}</td>
 
 
              {{/fields}}
@@ -88,6 +91,11 @@
              {{/users}}
 
 </table>
+
+<div class="scroll">
+<a class="tst-next" href="?_index=5" rel="next">&gt;&gt;</a>
+</div>
+
     {{>footer}}
   </body>
 </html>

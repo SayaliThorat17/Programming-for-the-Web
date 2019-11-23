@@ -8,7 +8,7 @@
     <h1>Create / Update Sensor Types</h1>
     <ul>
       {{#errors}}
-        <li class="error">{{.}}</li>
+        <li class="error">{{errors}}</li>
       {{/errors}}
     </ul>
     <form method="POST" action="{{{base}}}/tst-sensor-types-add.html">

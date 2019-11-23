@@ -52,8 +52,8 @@ const FIELDS_INFO = {
     isSelectBox: false,
     isLimits: false,
     isDisplay: true,
-    regex: /^\w+$/,
-    error: 'User Id field can only contain alphanumerics or _',
+    regex: /^[-\w]+$/,
+    error: 'Sensor Type ID field can only contain alphanumerics, - or _ characters',
   },
 
   modelNumber: {
@@ -64,8 +64,8 @@ const FIELDS_INFO = {
     isSelectBox: false,
     isLimits: false,
     isDisplay: true,
-    regex: /^\w+$/,
-    error: 'User Id field can only contain alphanumerics or _',
+    regex: /^[-'a-zA-Z0-9\s]+$/,
+    error: 'Model Number field can only contain -, space or alphanumeric characters',
   },
 
   manufacturer: {
@@ -76,8 +76,8 @@ const FIELDS_INFO = {
     isSelectBox: false,
     isLimits: false,
     isDisplay: true,
-    regex: /^\w+$/,
-    error: 'User Id field can only contain alphanumerics or _',
+    regex: /^[a-zA-Z '-]+$/,
+    error: 'Manufacturer field can only contain -, space or alphabetic characters',
   },
 
   quantity: {
@@ -89,32 +89,32 @@ const FIELDS_INFO = {
     isLimits: false,
     isDisplay: true,
     regex: /^\w+$/,
-    error: 'User Id field can only contain alphanumerics or _',
+    error: 'Measure field can only contain temperature, pressure, flow or humidity',
   },
 
 
   min: {
-    friendlyName: 'Min',
+    friendlyName: 'Limits Min',
     isSearch: true,
     //isId: true,
     isRequired: true,
     isSelectBox: false,
     isDisplay: false,
     //isLimits: true,
-    regex: /^\w+$/,
-    error: 'User Id field can only contain alphanumerics or _',
+    regex: /^[0-9]*$/,
+    error: 'Limits Min field can only contain a number',
   },
 
   max: {
-    friendlyName: 'Max',
+    friendlyName: 'Limits Max',
     isSearch: true,
   //  isId: true,
     isRequired: true,
     isSelectBox: false,
     isDisplay: false,
   //  isLimits: true,
-    regex: /^\w+$/,
-    error: 'User Id field can only contain alphanumerics or _',
+    regex: /^[0-9]*$/,
+    error: 'Limits Max field can only contain a number',
   },
 
 };
@@ -131,8 +131,8 @@ const FIELDS =
       isId: true,
       isRequired: true,
       isSensorsSearch: true,
-      regex: /^\w+$/,
-      error: 'User Id field can only contain alphanumerics or _',
+      regex: /^[-\w]+$/,
+      error: 'Sensor ID field can only contain alphanumerics, - or _ characters',
     },
 
     model: {
@@ -143,8 +143,8 @@ const FIELDS =
       isSensorsSearch: true,
     //  isSelectBox: false,
       //isLimits: false,
-      regex: /^\w+$/,
-      error: 'Model field can only contain alphanumerics or _',
+      regex: /^[-\w]+$/,
+      error: 'Model field can only contain alphanumerics , - or _ characters',
     },
 
 
@@ -156,33 +156,33 @@ const FIELDS =
       isSensorsSearch: true,
       //isSelectBox: true,
       //isLimits: false,
-      regex: /^\w+$/,
-      error: 'Period field can only contain alphanumerics or _',
+      regex: /^\d+$/,
+      error: 'Period field can only contain an integer',
     },
 
 
     min: {
-      friendlyName: 'Min',
+      friendlyName: 'Expected Min',
       isSearch: true,
       isId: true,
       isRequired: true,
       isSensorsSearch: false,
       //isSelectBox: false,
       //isLimits: true,
-      regex: /^\w+$/,
-      error: 'Min field can only contain alphanumerics or _',
+      regex: /^[0-9]*$/,
+      error: 'Expected Min field can only contain a number',
     },
 
     max: {
-      friendlyName: 'Max',
+      friendlyName: 'Expected Max',
       isSearch: true,
       isId: true,
       isRequired: true,
       isSensorsSearch: false,
     //isSelectBox: false,
     // isLimits: true,
-      regex: /^\w+$/,
-      error: 'Max field can only contain alphanumerics or _',
+      regex: /^[0-9]*$/,
+      error: 'Expected Max field can only contain a number',
     },
 
   };
@@ -215,6 +215,8 @@ const FIELDS =
       let min = user.min;
       let max = user.max;
       user.limits={min,max};
+      let x =user.quantity;
+      //let y=user.id;
       //let min,max;
       //user.limits={min:user.min,max=user.max};
       //console.log("Limits",user.limits);
@@ -222,12 +224,23 @@ const FIELDS =
       if (!errors) {
         try {
   //	if (isUpdate) {
-  	  await app.locals.model.update('sensor-types',user);
+  console.log("x",x);
+      if(x===null || x===undefined){
+        const errMsg ={'errors':'A value for Measure must be provided.'};
+      //  const model = errorModel(app, user, errors:errMsg);
+        const model = { base: app.locals.base, errors:errMsg };
+        const html = doMustache(app,'tst-sensor-types-add',model);
+          res.send(html);
+      }
+      else{
+  	       await app.locals.model.update('sensor-types',user);
   	//}
   //	else {
   	//  await app.locals.model.create(user);
   	//}
-  	res.redirect(`${app.locals.base}/tst-sensor-types-search.html`);
+
+  	     res.redirect(`${app.locals.base}/tst-sensor-types-search.html`);
+          }
         }
         catch (err) {
   	console.error(err);
@@ -271,7 +284,7 @@ const FIELDS =
   };
 */
 
-  function doSearch(app) {
+function doSearch(app) {
     return async function(req, res) {
       const isSubmit = req.query.submit !== undefined;
       let users = [];
@@ -281,7 +294,7 @@ const FIELDS =
         errors = validate(search);
         if (Object.keys(search).length == 0) {
   	const msg = 'at least one search parameter must be specified';
-  	errors = Object.assign(errors || {}, { _: msg });
+  //	errors = Object.assign(errors || {}, { _: msg });
         }
       //  if (!errors) {
   	const q = querystring.stringify(search);
@@ -305,19 +318,41 @@ const FIELDS =
       let model;
       //if (users.length > 0) {
         //template = 'details';
-        const fields =
-  	users.data.map((u) => ({id: u.id, fields: fieldsWithValues(u)}));
-        model = { base: app.locals.base, users: fields, fields:FIELDS };
+      //  const fields =
+  	//users.data.map((u) => ({id: u.id, fields: fieldsWithValues(u)}));
+        //model = { base: app.locals.base, users: fields, fields:FIELDS };
       //}
       //else {
       //  template =  'search';
       //  model = errorModel(app, search, errors);
       //}
+
+      if (errors){
+
+        //console.log("aa ",q);
+
+      //  let temp = q.split("=");
+      //  let c =temp[1];
+        //console.log("c",c)
+        //let str = "no results for sensor-type id "+c;
+      //  console.log("str",str);
+        //const errMsg ={'errors':str};
+        const errMsg ={'errors':'No results found.'};
+        model = { base: app.locals.base, errors:errMsg };
+      }
+      else {
+
+        const fields =
+    users.data.map((u) => ({id: u.id, fields: fieldsWithValues(u)}));
+    //console.log("bb",fields);
+        model = { base: app.locals.base, users: fields, fields:FIELDS };
+
+      }
+
       const html = doMustache(app, 'tst-sensor-types-search', model);
       res.send(html);
     };
   };
-
 
 ///////sensors
 function addSensors(app) {
@@ -389,7 +424,7 @@ function SearchSensors(app) {
       errors = validate1(search);
       if (Object.keys(search).length == 0) {
 	const msg = 'at least one search parameter must be specified';
-	errors = Object.assign(errors || {}, { _: msg });
+	//errors = Object.assign(errors || {}, { _: msg });
       }
       //if (!errors) {
 	const q = querystring.stringify(search);
@@ -412,14 +447,39 @@ function SearchSensors(app) {
     let model, template;
   //  if (users.length > 0) {
     //  template = 'details';
-      const fields =
-	users.data.map((u) => ({id: u.id, fields: fieldsWithValues1(u)}));
-      model = { base: app.locals.base, users: fields ,fields:FIELDS1};
+    //  const fields =
+	//users.data.map((u) => ({id: u.id, fields: fieldsWithValues1(u)}));
+    //  model = { base: app.locals.base, users: fields ,fields:FIELDS1};
   //  }
   //  else {
     //  template =  'search';
     //  model = errorModel1(app, search, errors);
     //}
+
+    if (errors){
+
+        //console.log("aa ",q);
+
+        //let temp = q.split("=");
+        //let c =temp[1];
+        //console.log("c",c)
+        //let str = "no results for sensors id "+c;
+      //  console.log("str",str);
+        //const errMsg ={'errors':str};
+      const errMsg ={'errors':'No results found.'};
+        model = { base: app.locals.base, errors:errMsg };
+      }
+      else {
+
+        const fields =
+    	users.data.map((u) => ({id: u.id, fields: fieldsWithValues1(u)}));
+
+      model = { base: app.locals.base, users: fields ,fields:FIELDS1};
+
+      }
+
+
+
     const html = doMustache(app, 'tst-sensors-search', model);
     res.send(html);
   };

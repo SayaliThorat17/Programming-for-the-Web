@@ -8,7 +8,7 @@
     <h1>Search Sensor Types</h1>
     <ul>
       {{#errors}}
-        <li class="error">{{.}}</li>
+        <li class="error">{{errors}}</li>
       {{/errors}}
     </ul>
     <form method="GET" action="{{{base}}}/tst-sensor-types-search.html">
@@ -79,7 +79,7 @@
 
 
 
-<table border="5" cellspacing="3"  >
+<table border="1" width="100%" >
 
   <tr>
            <th>Sensor Type ID</th>
@@ -103,7 +103,7 @@
 
 
 
-                      <td>{{value}}</td>
+                  <td style="text-align:center">{{value}}</td>
 
 
              {{/fields}}
@@ -111,6 +111,12 @@
              {{/users}}
 
 </table>
+
+
+<div class="scroll">
+<a class="tst-next" href="?_index=5" rel="next">&gt;&gt;</a>
+</div>
+
     {{>footer}}
   </body>
 </html>
