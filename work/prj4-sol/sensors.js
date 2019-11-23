@@ -156,7 +156,7 @@ const FIELDS =
       isSensorsSearch: true,
       //isSelectBox: true,
       //isLimits: false,
-      regex: /^\d+$/,
+      regex: /(?<=\s|^)\d+(?=\s|$)/,
       error: 'Period field can only contain an integer',
     },
 
@@ -223,23 +223,17 @@ const FIELDS =
       //const isUpdate = req.body.submit === 'update';
       if (!errors) {
         try {
-  //	if (isUpdate) {
-  console.log("x",x);
+  //console.log("x",x);
       if(x===null || x===undefined){
         const errMsg ={'errors':'A value for Measure must be provided.'};
-      //  const model = errorModel(app, user, errors:errMsg);
         const model = { base: app.locals.base, errors:errMsg };
         const html = doMustache(app,'tst-sensor-types-add',model);
           res.send(html);
       }
       else{
   	       await app.locals.model.update('sensor-types',user);
-  	//}
-  //	else {
-  	//  await app.locals.model.create(user);
-  	//}
 
-  	     res.redirect(`${app.locals.base}/tst-sensor-types-search.html`);
+  	     res.redirect(`${app.locals.base}/tst-sensor-types-search.html?id=`+user.id);
           }
         }
         catch (err) {
@@ -290,13 +284,11 @@ function doSearch(app) {
       let users = [];
       let errors = undefined;
       const search = getNonEmptyValues(req.query);
-      //if (isSubmit) {
         errors = validate(search);
         if (Object.keys(search).length == 0) {
   	const msg = 'at least one search parameter must be specified';
-  //	errors = Object.assign(errors || {}, { _: msg });
+
         }
-      //  if (!errors) {
   	const q = querystring.stringify(search);
   	try {
   	  users = await app.locals.model.list('sensor-types',search);
@@ -313,41 +305,33 @@ function doSearch(app) {
   	if (users.length === 0) {
   	  errors = {_: 'no users found for specified criteria; please retry'};
   	}
-      //  }
-    //  }
-      let model;
-      //if (users.length > 0) {
-        //template = 'details';
-      //  const fields =
-  	//users.data.map((u) => ({id: u.id, fields: fieldsWithValues(u)}));
-        //model = { base: app.locals.base, users: fields, fields:FIELDS };
-      //}
-      //else {
-      //  template =  'search';
-      //  model = errorModel(app, search, errors);
-      //}
+
+     let model;
 
       if (errors){
 
         //console.log("aa ",q);
 
-      //  let temp = q.split("=");
-      //  let c =temp[1];
+        //let temp = q.split("=");
+        //let c =temp[1];
         //console.log("c",c)
-        //let str = "no results for sensor-type id "+c;
+        //let str = "no results for sensors id "+c;
       //  console.log("str",str);
         //const errMsg ={'errors':str};
+        let fields;
         const errMsg ={'errors':'No results found.'};
-        model = { base: app.locals.base, errors:errMsg };
+        model = { base: app.locals.base, errors:errMsg ,fields :FIELDS};
       }
       else {
 
         const fields =
-    users.data.map((u) => ({id: u.id, fields: fieldsWithValues(u)}));
-    //console.log("bb",fields);
+        users.data.map((u) => ({id: u.id, fields: fieldsWithValues(u)}));
         model = { base: app.locals.base, users: fields, fields:FIELDS };
 
       }
+
+
+
 
       const html = doMustache(app, 'tst-sensor-types-search', model);
       res.send(html);
@@ -387,25 +371,21 @@ function createUpdateUserSensors(app) {
     let min = user.min;
     let max = user.max;
     user.expected={min,max};
+  //  console.log("hehe",user.id);
 
-    //if (!errors) {
+
       try {
-//	if (isUpdate) {
+
     await app.locals.model.update('sensors',user);
-  //}
-//	else {
-  //  await app.locals.model.create(user);
-  //}
-  res.redirect(`${app.locals.base}/tst-sensors-search.html`);
+
+  res.redirect(`${app.locals.base}/tst-sensors-search.html?id=`+user.id);
       }
       catch (err) {
   console.error(err);
   errors = wsErrors(err);
       }
-    //}
     if (errors) {
       const model = errorModel1(app, user, errors);
-    //  const html = doMustache(app, (isUpdate) ? 'update' : 'create', model);
     const html = doMustache(app,'tst-sensors-add',model);
       res.send(html);
     }
@@ -420,13 +400,12 @@ function SearchSensors(app) {
     let users = [];
     let errors = undefined;
     const search = getNonEmptyValues1(req.query);
-    //if (isSubmit) {
+
       errors = validate1(search);
       if (Object.keys(search).length == 0) {
 	const msg = 'at least one search parameter must be specified';
 	//errors = Object.assign(errors || {}, { _: msg });
       }
-      //if (!errors) {
 	const q = querystring.stringify(search);
 	try {
 	  users = await app.locals.model.list('sensors',search);
@@ -442,22 +421,11 @@ function SearchSensors(app) {
 	if (users.length === 0) {
 	  errors = {_: 'no users found for specified criteria; please retry'};
 	}
-    //  }
-    //}
+
     let model, template;
-  //  if (users.length > 0) {
-    //  template = 'details';
-    //  const fields =
-	//users.data.map((u) => ({id: u.id, fields: fieldsWithValues1(u)}));
-    //  model = { base: app.locals.base, users: fields ,fields:FIELDS1};
-  //  }
-  //  else {
-    //  template =  'search';
-    //  model = errorModel1(app, search, errors);
-    //}
 
     if (errors){
-
+      let fields;
         //console.log("aa ",q);
 
         //let temp = q.split("=");
@@ -467,7 +435,7 @@ function SearchSensors(app) {
       //  console.log("str",str);
         //const errMsg ={'errors':str};
       const errMsg ={'errors':'No results found.'};
-        model = { base: app.locals.base, errors:errMsg };
+        model = { base: app.locals.base, errors:errMsg ,fields:FIELDS1};
       }
       else {
 

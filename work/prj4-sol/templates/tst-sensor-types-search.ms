@@ -52,15 +52,16 @@
 	  {{/isSearch}}
     {{/isDisplay}}
 	 {{/fields}}
+   <centre>
       <input name="search" type="submit" value="search" class="control">
-
+</centre>
 
 
     </form>
 
 
+  {{^errors}}
     <h2>Results Summary</h2>
-
 
    <!--{{#users}}
          <dl>
@@ -73,10 +74,6 @@
 
          </dl>
        {{/users}} -->
-
-
-
-
 
 
 <table border="1" width="100%" >
@@ -116,6 +113,8 @@
 <div class="scroll">
 <a class="tst-next" href="?_index=5" rel="next">&gt;&gt;</a>
 </div>
+
+{{/errors}}
 
     {{>footer}}
   </body>

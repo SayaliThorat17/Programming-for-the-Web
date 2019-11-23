@@ -56,7 +56,7 @@ h1 {
 
 form {
   display: grid;
-  grid-template-columns: 0.5fr 1fr;
+  grid-template-columns: 2.0fr 2.5fr;
   grid-gap: 2vw;
 }
 
@@ -80,6 +80,7 @@ label {
   font-weight: bold;
   text-align: right;
 }
+
 
 
 .error {

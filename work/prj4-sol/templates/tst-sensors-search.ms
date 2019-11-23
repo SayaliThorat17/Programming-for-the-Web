@@ -41,8 +41,11 @@
 
     </form>
   </div>
-    <h2>Results Summary</h2>
 
+
+
+  {{^errors}}
+    <h2>Results Summary</h2>
 
    <!--{{#users}}
          <dl>
@@ -55,10 +58,6 @@
 
          </dl>
        {{/users}} -->
-
-
-
-
 
 
 <table border="1" width="100%" >
@@ -95,6 +94,9 @@
 <div class="scroll">
 <a class="tst-next" href="?_index=5" rel="next">&gt;&gt;</a>
 </div>
+
+
+{{/errors}}
 
     {{>footer}}
   </body>
