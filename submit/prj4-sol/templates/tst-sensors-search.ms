@@ -79,12 +79,13 @@
            {{#users}}
            <tr>
             {{#fields}}
+            {{#isSearch}}
 
 
 
                       <td style="text-align:center">{{value}}</td>
 
-
+                        {{/isSearch}}
              {{/fields}}
            </tr>
              {{/users}}
@@ -92,9 +93,13 @@
 </table>
 
 <div class="scroll">
+{{#p}}
+    <a class="tst-prev" href="?_index&#x3D;{{p}}" rel="prev">&lt;&lt;</a>
+{{/p}}
 
-    <a class="tst-prev" href="http://localhost:2346/tst-sensors-search.html?_index=5" rel="prev">&lt;&lt;</a>
-    <a class="tst-next" href="http://localhost:2346/tst-sensors-search.html?_index=5" rel="next">&gt;&gt;</a>
+{{#n}}
+    <a class="tst-next" href="?_index&#x3D;{{n}}" rel="next">&gt;&gt;</a>
+{{/n}}
     </div>
 
 

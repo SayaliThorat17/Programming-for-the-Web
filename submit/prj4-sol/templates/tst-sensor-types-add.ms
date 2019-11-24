@@ -14,6 +14,7 @@
     <form method="POST" action="{{{base}}}/tst-sensor-types-add.html">
 
     {{#fields}}
+    {{#isSearch}}
   	    <label>
   	    <span class="label">
 
@@ -21,6 +22,7 @@
   	    </span>
 
          {{#isSelectBox}}
+
             <select name="quantity" id="quantity" class="tst-Measure">
             <option value="" selected="">
             Select
@@ -50,6 +52,7 @@
 	    {{#errorMessage}}
 	      <span class="error">{{errorMessage}}</span><br/>
 	    {{/errorMessage}}
+      {{/isSearch}}
 	 {{/fields}}
       <input name="submit" type="submit" value="add" class="control">
     </form>

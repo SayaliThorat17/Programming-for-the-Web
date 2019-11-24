@@ -14,6 +14,7 @@
     <form method="POST" action="{{{base}}}/tst-sensors-add.html">
 
     {{#fields}}
+    {{#isSearch}}
   	    <label>
   	    <span class="label">
 
@@ -30,6 +31,7 @@
 	    {{#errorMessage}}
 	      <span class="error">{{errorMessage}}</span><br/>
 	    {{/errorMessage}}
+      {{/isSearch}}
 	 {{/fields}}
       <input name="submit" type="submit" value="add" class="control">
     </form>

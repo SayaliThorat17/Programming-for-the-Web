@@ -117,6 +117,12 @@ const FIELDS_INFO = {
     error: 'Limits Max field can only contain a number',
   },
 
+  _index:{
+      friendlyName: 'Index',
+      isYes: true,
+      isSearch : false,
+  },
+
 };
 
 const FIELDS =
@@ -183,6 +189,12 @@ const FIELDS =
     // isLimits: true,
       regex: /^[0-9]*$/,
       error: 'Expected Max field can only contain a number',
+    },
+
+    _index:{
+        friendlyName: 'Index',
+        isYes: true,
+        isSearch : false,
     },
 
   };
@@ -326,7 +338,10 @@ function doSearch(app) {
 
         const fields =
         users.data.map((u) => ({id: u.id, fields: fieldsWithValues(u)}));
-        model = { base: app.locals.base, users: fields, fields:FIELDS };
+
+        let p ,n;
+
+        model = { base: app.locals.base, users: fields, fields:FIELDS,p: users.previousIndex, n : users.nextIndex };
 
       }
 
@@ -441,8 +456,9 @@ function SearchSensors(app) {
 
         const fields =
     	users.data.map((u) => ({id: u.id, fields: fieldsWithValues1(u)}));
+        let p ,n;
 
-      model = { base: app.locals.base, users: fields ,fields:FIELDS1};
+      model = { base: app.locals.base, users: fields ,fields:FIELDS1,p: users.previousIndex, n : users.nextIndex};
 
       }
 
